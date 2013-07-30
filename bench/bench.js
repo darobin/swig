@@ -16,6 +16,18 @@ swigNext.setDefaults({ cache: false });
 console.log('Benchmarking');
 console.info('Bigger is better');
 
+function lpad(str, width) {
+  var a = [];
+  a.length = width - str.length;
+  return a.join(' ') + str;
+}
+
+function rpad(str, width) {
+  var a = [];
+  a.length = width - str.length;
+  return str + a.join(' ');
+}
+
 var locals = {
     obj: { a: 'a', b: 'b', c: 'c', d: 'd', e: 'e' },
     arr: ['a', 'b', 'c', 'd', 'e']
@@ -30,7 +42,8 @@ var locals = {
       src: src,
       old: oldSwig.compileFile(file),
       next: swigNext.compileFile(file),
-      results: []
+      render: [],
+      compile: []
     };
   }).value();
 
@@ -45,12 +58,13 @@ function runTpl(idx, render) {
       },
       result: function result(name, stats) {
         var ops = stats.iterations * (1000 / stats.elapsed);
-        console.log(name, Math.round(ops));
-        tpls[idx].results.push({ name: name, ops: ops });
+        console.log(rpad(name, 31), lpad(String(Math.round(ops)), 10));
+        tpls[idx][render ? 'render' : 'compile'].push({ name: name, ops: ops });
       },
       done: function done() {
-        var max = _.max(tpls[idx].results, 'ops'),
-          min = _.min(tpls[idx].results, 'ops');
+        var results = tpls[idx][render ? 'render' : 'compile'],
+          max = _.max(results, 'ops'),
+          min = _.min(results, 'ops');
 
         console.log('----------------------------------------');
         console.log(max.name, 'is', Math.round((max.ops / min.ops) * 100) / 100, 'times faster');
@@ -94,9 +108,9 @@ function runTpl(idx, render) {
   suite.run();
 }
 
-runTpl(0, false);
+runTpl(0);
 
 // console.log('----------------------------------------')
-// console.log(tpls[1].old.render(locals));
+// console.log(tpls[0].old.render(locals));
 // console.log('----------------------------------------')
-// console.log(tpls[1].next(locals));
+// console.log(tpls[0].next(locals));
