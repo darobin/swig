@@ -1,0 +1,13 @@
+<!doctype html>
+<html>
+<head>
+  {% spaceless %}
+  <title>{% block title %}{% endblock %}</title>
+  <link rel="stylesheet" href="foo.css">
+  {% block head %}{% endblock %}
+  {% endspaceless %}
+</head>
+<body>
+  {% block body %}{% endblock %}
+</body>
+</html>
