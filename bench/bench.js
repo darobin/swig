@@ -21,6 +21,7 @@ var locals = {
     arr: ['a', 'b', 'c', 'd', 'e']
   },
   tpls = _.filter(fs.readdirSync(__dirname + '/tpl/'), function (tpl) {
+    // return (/basic/).test(tpl);
     return !(/\.i\.html$/).test(tpl);
   });
 
@@ -50,12 +51,12 @@ function runTpl(idx) {
       }
     });
 
-  suite.bench('swig@0.14.0      ', function (next) {
+  suite.bench('swig@0.14.0             ', function (next) {
     oldSwig.compileFile(__dirname + '/tpl/' + tpl).render(locals);
     next();
   });
 
-  suite.bench('Swig:Next        ', function (next) {
+  suite.bench('Swig:Next               ', function (next) {
     swigNext.compileFile(__dirname + '/tpl/' + tpl)(locals);
     next();
   });
@@ -64,3 +65,7 @@ function runTpl(idx) {
 }
 
 runTpl(0);
+
+// oldSwig.compileFile(__dirname + '/tpl/basic.html').render(locals)
+// console.log('================================')
+// swigNext.compileFile(__dirname + '/tpl/basic.html')(locals)
