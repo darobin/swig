@@ -67,7 +67,7 @@ function runTpl(idx, render) {
           min = _.min(results, 'ops');
 
         console.log('----------------------------------------');
-        console.log(max.name, 'is', Math.round((max.ops / min.ops) * 100) / 100, 'times faster');
+        console.log(max.name, 'is', Math.round(((Math.round((max.ops / min.ops) * 100) / 100) - 1) * 100) + '% faster');
         console.log('========================================');
 
         if (!render) {
