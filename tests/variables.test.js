@@ -3,6 +3,14 @@ var swig = require('../lib/swig'),
   _ = require('lodash'),
   Swig = swig.Swig;
 
+var n = new Swig(),
+  oDefaults = n.options;
+
+function resetOptions() {
+  swig.setDefaults(oDefaults);
+  swig.invalidateCache();
+}
+
 var cases = {
   'can be output': [
     { c: '{{ ap }}, {{ bu }}', e: 'apples, burritos' }
@@ -78,6 +86,10 @@ describe('Variables', function () {
   });
 
   describe('can throw errors when parsing', function () {
+    var oDefaults;
+    beforeEach(resetOptions);
+    afterEach(resetOptions);
+
     it('with left open state', function () {
       expect(function () {
         swig.render('{{ a(asdf }}');
@@ -100,7 +112,32 @@ describe('Variables', function () {
       expect(function () {
         swig.render('\n\n{{ a] }}');
       }).to.throwError(/Unexpected closing square bracket on line 3\./);
+      expect(function () {
+        swig.render('\n\n{{ a} }}');
+      }).to.throwError(/Unexpected closing curly brace on line 3\./);
     });
 
+    it('with colons outside of objects', function () {
+      expect(function () {
+        swig.render('{{ foo:bar }}');
+      }).to.throwError(/Unexpected colon on line 1\./);
+    });
+
+    it('with random dots', function () {
+      expect(function () {
+        swig.render('{{ .a }}');
+      }).to.throwError(/Unexpected key "a" on line 1\./);
+
+      expect(function () {
+        swig.render('{{ {a.foo: "1"} }}');
+      }).to.throwError(/Unexpected dot on line 1\./);
+    });
+
+    it('with bad commas', function () {
+      expect(function () {
+        swig.setDefaults({ autoescape: false });
+        swig.render('{{ foo, bar }}');
+      }).to.throwError(/Unexpected comma on line 1\./);
+    });
   });
 });
